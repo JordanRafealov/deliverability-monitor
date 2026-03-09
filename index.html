@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0a0a12">
+<title>Deliverability Monitor | Dopamine Digital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+/* Flash prevention */
+(function(){var t=localStorage.getItem('dm-theme');if(t)document.documentElement.setAttribute('data-theme',t);
+if(localStorage.getItem('dm-sidebar-collapsed')==='1')document.documentElement.classList.add('sidebar-collapsed-pending');})();
+</script>
+<style>
+/* ===== DD DESIGN SYSTEM (wiki.css matched) ===== */
+:root,[data-theme="dark"]{
+  --bg:#0a0a12;--surface:#13132a;--surface-2:#1a1a35;--surface-3:#22223d;
+  --border:#2a2a4a;--border-hover:#3d3d6a;
+  --text:#e8e8f0;--text-dim:#8888a8;--text-muted:#5a5a78;
+  --purple:#8b5cf6;--purple-bright:#a78bfa;--purple-soft:rgba(139,92,246,.10);--purple-glow:rgba(139,92,246,.06);
+  --green:#22c55e;--green-soft:rgba(34,197,94,.10);
+  --amber:#f59e0b;--amber-soft:rgba(245,158,11,.10);
+  --blue:#3b82f6;--blue-soft:rgba(59,130,246,.10);
+  --cyan:#06b6d4;--cyan-soft:rgba(6,182,212,.10);
+  --pink:#ec4899;--pink-soft:rgba(236,72,153,.10);
+  --red:#ef4444;--red-soft:rgba(239,68,68,.10);
+  --shadow:rgba(0,0,0,.4);
+  --gradient:linear-gradient(135deg,#7c3aed 0%,#8b5cf6 50%,#a78bfa 100%);
+  --card-glow:0 0 0 1px rgba(139,92,246,.0),0 8px 40px rgba(0,0,0,.0)
+}
+[data-theme="light"]{
+  --bg:#f5f5fa;--surface:#fff;--surface-2:#ededf5;--surface-3:#e4e4f0;
+  --border:#c8c8da;--border-hover:#a8a8c0;
+  --text:#1a1a2e;--text-dim:#585878;--text-muted:#8888a0;
+  --purple:#7c3aed;--purple-bright:#6d28d9;--purple-soft:rgba(124,58,237,.06);--purple-glow:rgba(124,58,237,.04);
+  --green:#16a34a;--green-soft:rgba(22,163,74,.06);
+  --amber:#d97706;--amber-soft:rgba(217,119,6,.06);
+  --blue:#2563eb;--blue-soft:rgba(37,99,235,.06);
+  --cyan:#0891b2;--cyan-soft:rgba(8,145,178,.06);
+  --pink:#db2777;--pink-soft:rgba(219,39,119,.06);
+  --red:#dc2626;--red-soft:rgba(220,38,38,.06);
+  --shadow:rgba(0,0,0,.06);
+  --gradient:linear-gradient(135deg,#6d28d9 0%,#7c3aed 50%,#8b5cf6 100%);
+  --card-glow:0 0 0 1px rgba(124,58,237,.0),0 4px 20px rgba(0,0,0,.0)
+}
+
+/* ===== RESET ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+html:focus-within{scroll-behavior:smooth}
+[id]{scroll-margin-top:72px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;overflow-x:hidden}
+::selection{background:rgba(139,92,246,.3);color:#fff}
+.skip-link{position:absolute;top:-100%;left:16px;z-index:999;padding:8px 16px;background:var(--purple);color:#fff;border-radius:0 0 8px 8px;font-size:13px;font-weight:600;text-decoration:none;transition:top .2s}
+.skip-link:focus{top:0}
+
+/* ===== READING PROGRESS ===== */
+.reading-progress{position:fixed;top:0;left:0;height:2px;background:var(--gradient);z-index:100;width:0;transition:width .1s linear;pointer-events:none}
+
+/* ===== AMBIENT ===== */
+.ambient{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.ambient .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.035;animation:orb-float 20s ease-in-out infinite}
+.ambient .orb:nth-child(1){width:600px;height:600px;background:#8b5cf6;top:-200px;left:-100px;animation-delay:0s}
+.ambient .orb:nth-child(2){width:500px;height:500px;background:#3b82f6;bottom:-200px;right:-100px;animation-delay:-7s}
+.ambient .orb:nth-child(3){width:400px;height:400px;background:#8b5cf6;top:50%;left:50%;transform:translate(-50%,-50%);animation-delay:-14s}
+@keyframes orb-float{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(30px,-30px) scale(1.05)}50%{transform:translate(-20px,20px) scale(.95)}75%{transform:translate(20px,10px) scale(1.02)}}
+[data-theme="light"] .ambient .orb{opacity:.02}
+
+/* ===== TOPBAR ===== */
+.topbar{position:fixed;top:0;right:0;z-index:50;background:rgba(10,10,18,.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px 0 12px;height:56px;display:flex;align-items:center;justify-content:space-between;transition:background .3s}
+[data-theme="light"] .topbar{background:rgba(245,245,250,.92)}
+.topbar-left{display:flex;align-items:center;gap:14px}
+.topbar-logo{height:28px;width:28px;object-fit:cover;border-radius:6px}
+a:has(.topbar-logo){display:flex;align-items:center;line-height:0}
+.topbar-title{font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--text);line-height:1}
+.topbar-breadcrumb{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted)}
+.topbar-breadcrumb a{color:var(--text-dim);text-decoration:none;font-weight:500;transition:color .2s}
+.topbar-breadcrumb a:hover{color:var(--purple)}
+.topbar-breadcrumb .bc-sep{opacity:.4;font-size:10px}
+.topbar-breadcrumb .bc-current{color:var(--text);font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.theme-toggle{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:0 12px;height:34px;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--text-dim);transition:all .2s;font-family:'Inter',sans-serif}
+.theme-toggle:hover{border-color:var(--border-hover);color:var(--text)}
+
+/* Sidebar-aware topbar */
+.has-toc .topbar{left:260px;background:var(--bg);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+.has-toc .topbar .topbar-logo,.has-toc .topbar .topbar-title{display:none}
+body.sidebar-collapsed .topbar{left:0!important}
+body.sidebar-collapsed .topbar .topbar-logo,body.sidebar-collapsed .topbar .topbar-title{display:initial;opacity:1}
+
+/* ===== SIDEBAR ===== */
+.toc-sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--surface);border-right:1px solid var(--border);overflow:visible;z-index:90;padding:0;transition:transform .3s;display:flex;flex-direction:column}
+.has-toc{padding-left:260px}
+@media(max-width:1100px){.has-toc{padding-left:0}.has-toc .topbar{left:0}.has-toc .topbar .topbar-logo,.has-toc .topbar .topbar-title{display:initial}.toc-sidebar{transform:translateX(-100%)}.toc-sidebar.open{transform:translateX(0);box-shadow:4px 0 24px var(--shadow)}}
+.toc-header{display:flex;align-items:center;gap:14px;padding:0 20px;height:56px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.toc-header a.toc-workspace{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);font-size:14px;font-weight:700;letter-spacing:-.2px;transition:opacity .15s;line-height:0;white-space:nowrap;overflow:hidden}
+.toc-header a.toc-workspace:hover{opacity:.7;text-decoration:none}
+.toc-header img{height:28px;width:28px;object-fit:cover;border-radius:6px}
+.toc-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0;display:flex;flex-direction:column;box-shadow:none!important;scrollbar-width:thin;scrollbar-color:transparent transparent}
+.toc-body:hover{scrollbar-color:var(--border) transparent}
+.toc-body::-webkit-scrollbar{width:3px}
+.toc-body::-webkit-scrollbar-thumb{background:transparent;border-radius:3px}
+.toc-body:hover::-webkit-scrollbar-thumb{background:var(--border)}
+.toc-section{padding:8px 0;margin:0 12px;border-bottom:1px solid var(--border)}
+.toc-section:last-child{border-bottom:none}
+.toc-section-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;padding:4px 12px 4px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.toc-section-label::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;flex-shrink:0;background:currentColor}
+.sb-label-purple{color:var(--purple)}.sb-label-green{color:var(--green)}.sb-label-amber{color:var(--amber)}.sb-label-red{color:var(--red)}.sb-label-cyan{color:var(--cyan)}.sb-label-blue{color:var(--blue)}
+.toc-link{display:flex;align-items:center;gap:8px;padding:5px 12px;font-size:12.5px;color:var(--text-dim);text-decoration:none;border-left:3px solid transparent;border-radius:4px;transition:all .15s;line-height:1.4;margin:1px 0;font-weight:400;cursor:pointer}
+.toc-link:hover{color:var(--text);background:var(--surface-2);text-decoration:none}
+.toc-link.active{color:var(--purple);border-left-color:var(--purple);background:var(--purple-soft);font-weight:600}
+.ext-arrow{margin-left:auto;font-size:9px;opacity:0;transition:opacity .15s;color:var(--text-muted)}
+.dash-ext{display:flex;align-items:center}
+.dash-ext:hover .ext-arrow{opacity:.6}
+.ws-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ws-dot.green{background:var(--green)}.ws-dot.yellow{background:var(--amber)}.ws-dot.red{background:var(--red)}
+
+/* Sidebar collapse/expand */
+.sidebar-edge-btn{position:absolute;top:50%;right:-24px;transform:translateY(-50%);z-index:91;width:24px;height:40px;border-radius:0 6px 6px 0;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);font-size:10px;opacity:0;transition:opacity .2s,color .15s;padding:0}
+.toc-sidebar:hover .sidebar-edge-btn,.sidebar-edge-btn:hover{opacity:1}
+.sidebar-edge-btn:hover{color:var(--text);background:var(--surface)}
+.sidebar-expand-btn{position:fixed;top:50%;left:0;transform:translateY(-50%);z-index:91;width:20px;height:40px;border-radius:0 6px 6px 0;background:var(--surface);border:1px solid var(--border);border-left:none;display:none;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:var(--text-muted);transition:all .15s;padding:0;opacity:.5}
+.sidebar-expand-btn:hover{opacity:1;color:var(--text);background:var(--surface);width:24px}
+body.sidebar-collapsed .toc-sidebar{transform:translateX(-100%)}
+body.sidebar-collapsed{padding-left:0!important}
+body.sidebar-collapsed .sidebar-edge-btn{display:none}
+body.sidebar-collapsed .sidebar-expand-btn{display:flex}
+.sidebar-collapsed-pending .toc-sidebar{transform:translateX(-100%)!important}
+.sidebar-collapsed-pending{padding-left:0!important}
+
+/* Mobile toggle */
+.mobile-toggle{display:none;position:fixed;top:12px;left:12px;z-index:95;width:36px;height:36px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);cursor:pointer;align-items:center;justify-content:center;font-size:16px}
+@media(max-width:1100px){.mobile-toggle{display:flex!important}}
+
+/* ===== MAIN CONTENT ===== */
+.page{padding:0 40px;max-width:1100px;position:relative;z-index:1}
+.has-toc .page{margin-left:calc((100vw - 260px - 1100px) / 2);margin-right:calc((100vw - 260px - 1100px) / 2)}
+@media(max-width:1400px){.has-toc .page{margin-left:0;margin-right:0}}
+
+/* ===== HERO ===== */
+.sec{padding:0 40px}
+.sec.hero{padding:100px 40px 0}
+.hero h1{font-size:28px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px}
+.hero .sub{font-size:14px;color:var(--text-dim);margin-bottom:0}
+.hero .label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--green);margin-bottom:12px}
+.divider{height:1px;background:linear-gradient(90deg,transparent 0%,var(--border) 50%,transparent 100%);margin:32px auto}
+
+/* ===== STAT ROW ===== */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:32px auto 0}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;transition:all .2s;position:relative;overflow:hidden}
+.stat-card:hover{border-color:var(--border-hover);transform:translateY(-2px)}
+.stat-card::before{content:'';position:absolute;inset:0;border-radius:14px;opacity:0;transition:opacity .3s;pointer-events:none}
+.stat-card:hover::before{opacity:1}
+.stat-num{font-size:28px;font-weight:800;line-height:1.2}
+.stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:4px}
+
+/* ===== HEALTH SCORE RING ===== */
+.health-ring-wrap{display:flex;align-items:center;justify-content:center;gap:16px;padding:24px 0}
+.health-ring{position:relative;width:120px;height:120px}
+.health-ring svg{transform:rotate(-90deg)}
+.health-ring-bg{fill:none;stroke:var(--surface-2);stroke-width:8}
+.health-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s ease}
+.health-ring-score{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.health-ring-num{font-size:32px;font-weight:900;line-height:1}
+.health-ring-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-top:2px}
+.health-ring-meta{text-align:left}
+.health-ring-grade{font-size:14px;font-weight:700;margin-bottom:4px}
+.health-ring-detail{font-size:12px;color:var(--text-dim);line-height:1.6}
+
+/* ===== TABS ===== */
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px;overflow-x:auto;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{padding:12px 20px;font-size:13px;font-weight:600;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tab-btn:hover{color:var(--text-dim)}
+.tab-btn.active{color:var(--purple);border-bottom-color:var(--purple)}
+.tab-count{font-size:10px;padding:1px 6px;border-radius:9999px;background:var(--surface-2);color:var(--text-muted);font-weight:700}
+.tab-btn.active .tab-count{background:var(--purple-soft);color:var(--purple)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ===== WORKSPACE CARDS ===== */
+.ws-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:20px;overflow:hidden;transition:all .25s}
+.ws-card:hover{border-color:var(--border-hover)}
+.ws-card-header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+.ws-card-header:hover{background:var(--surface-2)}
+.ws-card-header h3{font-size:15px;font-weight:700;flex:1}
+.ws-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:9999px;text-transform:uppercase;letter-spacing:.5px}
+.ws-badge.green{background:var(--green-soft);color:var(--green)}
+.ws-badge.yellow{background:var(--amber-soft);color:var(--amber)}
+.ws-badge.red{background:var(--red-soft);color:var(--red)}
+.ws-meta{font-size:12px;color:var(--text-muted)}
+.ws-card-body{padding:0}
+.ws-card-body.collapsed{display:none}
+.ws-chevron{font-size:11px;color:var(--text-muted);transition:transform .2s;flex-shrink:0}
+.ws-card-header.collapsed .ws-chevron{transform:rotate(-90deg)}
+
+/* ===== DNS GRID ===== */
+.dns-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:16px 20px}
+.dns-card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:all .2s}
+.dns-card:hover{border-color:var(--border-hover)}
+.dns-domain{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text)}
+.dns-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px}
+.dns-label{color:var(--text-muted);font-weight:500}
+.dns-val{font-weight:600;max-width:180px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dns-val.pass{color:var(--green)}.dns-val.warn{color:var(--amber)}.dns-val.fail{color:var(--red)}
+
+/* ===== ACTION ITEMS ===== */
+.action-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:12px;transition:all .2s}
+.action-item:hover{border-color:var(--border-hover)}
+.action-sev{font-size:9px;font-weight:700;padding:3px 8px;border-radius:9999px;text-transform:uppercase;flex-shrink:0;margin-top:1px}
+.action-sev.red{background:var(--red-soft);color:var(--red)}
+.action-sev.yellow{background:var(--amber-soft);color:var(--amber)}
+.action-sev.green{background:var(--green-soft);color:var(--green)}
+.action-body{flex:1}
+.action-title{font-weight:600;color:var(--text);margin-bottom:2px}
+.action-desc{color:var(--text-dim)}
+.action-fix{color:var(--purple);font-weight:600;font-size:11px;margin-top:4px}
+.action-fix::before{content:'';display:inline-block;width:3px;height:10px;background:var(--gradient);border-radius:2px;margin-right:6px;vertical-align:middle}
+
+/* ===== BLACKLIST ===== */
+.bl-summary{padding:16px 20px}
+.bl-domain-row{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:13px}
+.bl-domain-name{font-weight:600;min-width:200px}
+.bl-status{font-weight:700;font-size:11px;text-transform:uppercase}
+.bl-status.clean{color:var(--green)}.bl-status.listed{color:var(--red)}
+.bl-details{color:var(--text-muted);font-size:11px;margin-left:auto}
+.bl-listings{padding:0 16px 8px 32px}
+.bl-listing-item{font-size:11px;color:var(--red);padding:2px 0;display:flex;align-items:center;gap:6px}
+.bl-listing-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--red);flex-shrink:0}
+
+/* ===== ACCOUNTS TABLE ===== */
+.accounts-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;border-radius:0;overflow:visible}
+th{text-align:left;padding:10px 14px;background:var(--surface-2);border:1px solid var(--border);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted)}
+td{padding:10px 14px;border:1px solid var(--border);color:var(--text-dim)}
+tr:hover td{background:var(--purple-glow)}
+td .acct-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:8px}
+td .acct-dot.green{background:var(--green)}.acct-dot.yellow{background:var(--amber)}.acct-dot.red{background:var(--red)}
+td.metric{font-weight:600;white-space:nowrap}
+td.metric.green{color:var(--green)}.metric.yellow{color:var(--amber)}.metric.red{color:var(--red)}
+
+/* ===== CAMPAIGN ISSUES ===== */
+.issue-list{padding:16px 20px}
+.issue-item{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px;font-size:12px}
+.issue-sev{font-size:9px;font-weight:700;padding:2px 8px;border-radius:9999px;text-transform:uppercase;flex-shrink:0}
+.issue-sev.yellow{background:var(--amber-soft);color:var(--amber)}
+.issue-sev.red{background:var(--red-soft);color:var(--red)}
+.issue-name{font-weight:600;color:var(--text);min-width:150px}
+.issue-detail{color:var(--text-dim)}
+
+/* ===== PLACEMENT ===== */
+.placement-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding:16px 20px}
+.placement-card{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.placement-card .provider{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px}
+.placement-val{font-size:22px;font-weight:800}
+.placement-label{font-size:10px;color:var(--text-muted);margin-top:2px}
+.placement-inbox{color:var(--green)}.placement-spam{color:var(--red)}.placement-promo{color:var(--amber)}.placement-missing{color:var(--text-muted)}
+
+/* ===== TREND SPARKLINE ===== */
+.trend-row{display:flex;align-items:center;gap:8px}
+.sparkline{width:60px;height:20px}
+.sparkline polyline{fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.trend-up{color:var(--green)}.trend-down{color:var(--red)}.trend-flat{color:var(--text-muted)}
+.trend-arrow{font-size:10px;font-weight:700}
+
+/* ===== SECTION HEADERS ===== */
+.section-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);padding:12px 20px 8px;display:flex;align-items:center;gap:8px}
+.section-header::before{content:'';width:3px;height:12px;border-radius:2px;background:var(--gradient)}
+
+/* ===== EMPTY STATE ===== */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-muted);font-size:13px;border:1px dashed var(--border);border-radius:14px;background:var(--purple-glow);margin:16px 20px}
+.empty-state code{background:var(--surface-2);padding:2px 8px;border-radius:5px;font-size:12px;color:var(--purple)}
+
+/* ===== FOOTER ===== */
+.footer{text-align:center;padding:48px 40px;border-top:none;margin-top:60px;position:relative;z-index:1}
+.footer::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:100vw;height:1px;background:var(--border)}
+.footer p{font-size:11px!important;color:var(--text-muted);font-weight:400;margin-bottom:0!important;letter-spacing:.3px}
+
+/* ===== FADE IN ===== */
+.fade-in{opacity:0;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:768px){
+  .sec{padding:0 20px}
+  .sec.hero{padding:72px 20px 0}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .dns-grid{grid-template-columns:1fr}
+  .placement-grid{grid-template-columns:repeat(2,1fr)}
+  table{font-size:11px}
+  th,td{padding:8px 10px}
+  .footer{padding:32px 16px}
+  .page{padding:0}
+}
+</style>
+</head>
+<body class="has-toc">
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div class="reading-progress" id="readingProgress"></div>
+<div class="ambient"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+
+<!-- Mobile toggle -->
+<button class="mobile-toggle" onclick="document.querySelector('.toc-sidebar').classList.toggle('open')">&#9776;</button>
+
+<!-- SIDEBAR -->
+<aside class="toc-sidebar" id="toc">
+  <div class="toc-header">
+    <a href="https://docs.dopaminedigital.io" class="toc-workspace">
+      <img src="https://docs.dopaminedigital.io/assets/logo.png" alt="DD">
+      <span>Dopamine Digital</span>
+    </a>
+  </div>
+  <div class="toc-body">
+    <div class="toc-section" data-phase="overview">
+      <div class="toc-section-label sb-label-purple">Overview</div>
+      <a class="toc-link active" data-tab="overview">Dashboard</a>
+      <a class="toc-link" data-tab="actions">Action Items</a>
+    </div>
+    <div class="toc-section" data-phase="source">
+      <div class="toc-section-label sb-label-cyan">Layers</div>
+      <a class="toc-link" data-tab="dns">DNS Authentication</a>
+      <a class="toc-link" data-tab="blacklists">Blacklists</a>
+      <a class="toc-link" data-tab="campaigns">Campaigns & Volume</a>
+      <a class="toc-link" data-tab="placement">Inbox Placement</a>
+    </div>
+    <div class="toc-section" data-phase="execute" id="ws-nav">
+      <div class="toc-section-label sb-label-green">Workspaces</div>
+      <a class="toc-link" onclick="switchTab('overview')"><span class="ws-dot yellow"></span>Dopamine Digital</a><a class="toc-link" onclick="switchTab('overview')"><span class="ws-dot red"></span>Jamie (Unstuck)</a><a class="toc-link" onclick="switchTab('overview')"><span class="ws-dot yellow"></span>Phellos</a><a class="toc-link" onclick="switchTab('overview')"><span class="ws-dot red"></span>ODF</a><a class="toc-link" onclick="switchTab('overview')"><span class="ws-dot red"></span>Ocon</a><a class="toc-link" onclick="switchTab('overview')"><span class="ws-dot yellow"></span>Ripple</a>
+    </div>
+    <div class="toc-section" data-phase="reference">
+      <div class="toc-section-label sb-label-blue">Quick Links</div>
+      <a class="toc-link dash-ext" href="https://docs.dopaminedigital.io" target="_blank" rel="noopener">Wiki Home <span class="ext-arrow">&#8599;</span></a>
+      <a class="toc-link dash-ext" href="https://app.instantly.ai" target="_blank" rel="noopener">Instantly <span class="ext-arrow">&#8599;</span></a>
+      <a class="toc-link dash-ext" href="https://app.mailreach.co" target="_blank" rel="noopener">MailReach <span class="ext-arrow">&#8599;</span></a>
+    </div>
+  </div>
+  <button class="sidebar-edge-btn" onclick="toggleSidebar()" aria-label="Collapse sidebar">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+</aside>
+<button class="sidebar-expand-btn" onclick="toggleSidebar()" aria-label="Expand sidebar">
+  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+</button>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="topbar-left">
+    <a href="https://docs.dopaminedigital.io"><img src="https://docs.dopaminedigital.io/assets/logo.png" alt="DD" class="topbar-logo"></a>
+    <span class="topbar-title">Dopamine Digital</span>
+    <div class="topbar-breadcrumb">
+      <span class="bc-text">Automations</span>
+      <span class="bc-sep">&#8250;</span>
+      <span class="bc-current">Deliverability Monitor</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span style="font-size:12px;color:var(--text-muted)">Tue Mar 10, 12:21 AM</span>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+      <span id="theme-icon"></span><span id="theme-label">Dark</span>
+    </button>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="page" id="main-content">
+  <div class="sec hero" id="top">
+    <div class="label">Deliverability Monitor</div>
+    <h1>Email Health Dashboard</h1>
+    <p class="sub">DNS authentication, blacklist monitoring, warmup health, campaign metrics, and inbox placement across all workspaces.</p>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-num" style="color:var(--purple)">126</div><div class="stat-label">Total Accounts</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--green)">86</div><div class="stat-label">Healthy</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--amber)">18</div><div class="stat-label">Warning</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--red)">22</div><div class="stat-label">Critical</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--cyan)">42</div><div class="stat-label">Domains</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--green)">42/42</div><div class="stat-label">BL Clean</div></div>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <!-- HEALTH SCORE -->
+  <div class="sec fade-in">
+      <div class="health-ring-wrap">
+        <div class="health-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle class="health-ring-bg" cx="60" cy="60" r="52"/>
+            <circle class="health-ring-fill" cx="60" cy="60" r="52" stroke="var(--green)" stroke-dasharray="326.7" stroke-dashoffset="32.7"/>
+          </svg>
+          <div class="health-ring-score">
+            <div class="health-ring-num" style="color:var(--green)">90</div>
+            <div class="health-ring-label">Health</div>
+          </div>
+        </div>
+        <div class="health-ring-meta">
+          <div class="health-ring-grade" style="color:var(--green)">Grade: A+</div>
+          <div class="health-ring-detail">42 domains across 6 workspaces</div>
+          <div style="margin-top:8px"><div style="font-size:12px;color:var(--text-dim)">dopaminedigitalco.com <span style="color:var(--amber);font-weight:700">76.0</span> (B)</div><div style="font-size:12px;color:var(--text-dim)">dopaminedigitalgroup.com <span style="color:var(--amber);font-weight:700">76.0</span> (B)</div><div style="font-size:12px;color:var(--text-dim)">dopaminedigitalhub.com <span style="color:var(--amber);font-weight:700">76.0</span> (B)</div><div style="font-size:12px;color:var(--text-dim)">dopaminedigitallabs.com <span style="color:var(--amber);font-weight:700">76.0</span> (B)</div><div style="font-size:12px;color:var(--text-dim)">dopaminedigitalpartners.com <span style="color:var(--amber);font-weight:700">76.0</span> (B)</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="divider"></div>
+
+  <!-- TABS -->
+  <div class="sec">
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="overview">Overview</button>
+      <button class="tab-btn" data-tab="actions">Actions <span class="tab-count">64</span></button>
+      <button class="tab-btn" data-tab="dns">DNS Audit <span class="tab-count">42</span></button>
+      <button class="tab-btn" data-tab="blacklists">Blacklists <span class="tab-count">0</span></button>
+      <button class="tab-btn" data-tab="campaigns">Campaigns <span class="tab-count">0</span></button>
+      <button class="tab-btn" data-tab="placement">Inbox Placement</button>
+    </div>
+
+    <div class="tab-panel active" id="panel-overview"><div class="ws-card">
+      <div class="ws-card-header">
+        <span class="ws-dot yellow"></span>
+        <h3>Dopamine Digital</h3>
+        <span class="ws-badge yellow">YELLOW</span>
+        <span class="ws-meta">18/18 active | 0G 18Y 0R | BL: 6/6 clean</span>
+      </div>
+      <div class="ws-card-body"><div class="accounts-wrap"><table><thead><tr><th>Account</th><th>Status</th><th>Age</th><th>Warmup</th><th>WU Reply %</th><th>WU Score</th><th>Issues</th></tr></thead><tbody><tr>
+              <td><span class="acct-dot yellow"></span>jordan.rafealov@dopaminedigitalpipeline.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">121.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan@dopaminedigitalpipeline.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">110.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordanrafealov@dopaminedigitalpipeline.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">153.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan.rafealov@dopaminedigitalgroup.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">126.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan@dopaminedigitalgroup.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">98.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordanrafealov@dopaminedigitalgroup.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">82.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordanrafealov@dopaminedigitalco.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">125.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan.rafealov@dopaminedigitalco.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">112.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan@dopaminedigitalco.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">141.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan@dopaminedigitalpartners.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">93.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordanrafealov@dopaminedigitalpartners.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">120.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan.rafealov@dopaminedigitalpartners.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">131.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan.rafealov@dopaminedigitalhub.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">112.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan@dopaminedigitalhub.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">118.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordanrafealov@dopaminedigitalhub.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">121.2%</td>
+              <td class="metric green">99%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan.rafealov@dopaminedigitallabs.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric yellow">70.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Warmup reply rate: 70.0%; Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordan@dopaminedigitallabs.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">132.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot yellow"></span>jordanrafealov@dopaminedigitallabs.com</td>
+              <td>active</td>
+              <td class="metric yellow">52d</td>
+              <td>ON</td>
+              <td class="metric green">120.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric yellow">Mailbox age: 52 days (vulnerable)</td>
+            </tr></tbody></table></div></div></div><div class="ws-card">
+      <div class="ws-card-header">
+        <span class="ws-dot red"></span>
+        <h3>Jamie (Unstuck)</h3>
+        <span class="ws-badge red">RED</span>
+        <span class="ws-meta">35/36 active | 17G 0Y 19R | BL: 12/12 clean</span>
+      </div>
+      <div class="ws-card-body"><div class="accounts-wrap"><table><thead><tr><th>Account</th><th>Status</th><th>Age</th><th>Warmup</th><th>WU Reply %</th><th>WU Score</th><th>Issues</th></tr></thead><tbody><tr>
+              <td><span class="acct-dot red"></span>jamie.s@scaleunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">105.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.schneiderman@scaleunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">108.7%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie@scaleunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">91.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.s@teamunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">118.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.schneiderman@teamunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">97.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie@teamunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">117.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.s@clickunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">117.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.schneiderman@clickunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">93.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie@clickunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">88.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.s@easyunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">131.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.schneiderman@easyunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">95.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie@easyunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">100.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.s@workunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">107.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.schneiderman@workunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">113.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie@workunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">80.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.s@freeunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">123.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie.schneiderman@freeunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">126.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamie@freeunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric red">28d</td>
+              <td>ON</td>
+              <td class="metric green">86.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Mailbox age: 28 days (vulnerable)</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>jamieschneiderman@growunstuckyourbusiness.com</td>
+              <td>error</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">-</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Account status: error</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie.schneiderman@growunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">155.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie@growunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">206.2%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie.schneiderman@unstuckyourbusinessgrowth.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">131.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamieschneiderman@unstuckyourbusinessgrowth.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">228.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie@unstuckyourbusinessgrowth.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">221.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie.schneiderman@unstuckyourbusinesspartners.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">182.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamieschneiderman@unstuckyourbusinesspartners.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">213.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie@unstuckyourbusinesspartners.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">188.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie.schneiderman@tryunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">136.2%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamieschneiderman@tryunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">193.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie@tryunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">115.0%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie.schneiderman@withunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">193.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamieschneiderman@withunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">178.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie@withunstuckyourbusiness.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">223.7%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie.schneiderman@unstuckyourbusinessconsultants.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">201.3%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamieschneiderman@unstuckyourbusinessconsultants.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">173.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>jamie@unstuckyourbusinessconsultants.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">145.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr></tbody></table></div></div></div><div class="ws-card">
+      <div class="ws-card-header">
+        <span class="ws-dot yellow"></span>
+        <h3>Phellos</h3>
+        <span class="ws-badge yellow">YELLOW</span>
+        <span class="ws-meta">18/18 active | 18G 0Y 0R | BL: 6/6 clean</span>
+      </div>
+      <div class="ws-card-body"><div class="accounts-wrap"><table><thead><tr><th>Account</th><th>Status</th><th>Age</th><th>Warmup</th><th>WU Reply %</th><th>WU Score</th><th>Issues</th></tr></thead><tbody><tr>
+              <td><span class="acct-dot green"></span>leokuyumciyan@phellosconsultants.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">197.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo.k@choosephellos.com</td>
+              <td>active</td>
+              <td class="metric green">121d</td>
+              <td>ON</td>
+              <td class="metric green">220.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo@phellosconsultants.com</td>
+              <td>active</td>
+              <td class="metric green">121d</td>
+              <td>ON</td>
+              <td class="metric green">206.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo.k@phellosconsultants.com</td>
+              <td>active</td>
+              <td class="metric green">121d</td>
+              <td>ON</td>
+              <td class="metric green">217.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo@phellosconsulting.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">185.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leokuyumciyan@choosephellos.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">181.2%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo@choosephellos.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">192.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leokuyumciyan@withphellos.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">155.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo@withphellos.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">223.7%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo.k@withphellos.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">198.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leokuyumciyan@phellosconsulting.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">213.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo.k@phellosconsulting.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">238.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leokuyumciyan@phellospartners.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">190.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo@phellospartners.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">207.5%</td>
+              <td class="metric green">96%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo.k@phellospartners.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">176.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leokuyumciyan@consultphellos.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">185.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo@consultphellos.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">206.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>leo.k@consultphellos.com</td>
+              <td>active</td>
+              <td class="metric green">122d</td>
+              <td>ON</td>
+              <td class="metric green">185.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr></tbody></table></div></div></div><div class="ws-card">
+      <div class="ws-card-header">
+        <span class="ws-dot red"></span>
+        <h3>ODF</h3>
+        <span class="ws-badge red">RED</span>
+        <span class="ws-meta">17/18 active | 17G 0Y 1R | BL: 6/6 clean</span>
+      </div>
+      <div class="ws-card-body"><div class="accounts-wrap"><table><thead><tr><th>Account</th><th>Status</th><th>Age</th><th>Warmup</th><th>WU Reply %</th><th>WU Score</th><th>Issues</th></tr></thead><tbody><tr>
+              <td><span class="acct-dot red"></span>daniel.lindsey@tryondemandfulfillment.com</td>
+              <td>error</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">-</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Account status: error</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel.lindsey@withondemandfulfillment.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">155.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniellindsey@withondemandfulfillment.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">216.2%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel@withondemandfulfillment.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">213.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel.lindsey@ondemandfulfillmentsolutions.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">222.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniellindsey@ondemandfulfillmentsolutions.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">240.0%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel@ondemandfulfillmentsolutions.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">193.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel.lindsey@ondemandfulfillmentlogistics.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">208.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniellindsey@ondemandfulfillmentlogistics.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">228.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel@ondemandfulfillmentlogistics.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">172.5%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel.lindsey@ondemandfulfillmentpartners.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">238.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniellindsey@ondemandfulfillmentpartners.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">215.0%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel@ondemandfulfillmentpartners.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">175.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel.lindsey@useondemandfulfillment.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">195.0%</td>
+              <td class="metric green">98%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniellindsey@tryondemandfulfillment.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">198.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel@tryondemandfulfillment.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">233.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniellindsey@useondemandfulfillment.com</td>
+              <td>active</td>
+              <td class="metric green">118d</td>
+              <td>ON</td>
+              <td class="metric green">218.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>daniel@useondemandfulfillment.com</td>
+              <td>active</td>
+              <td class="metric green">118d</td>
+              <td>ON</td>
+              <td class="metric green">135.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr></tbody></table></div></div></div><div class="ws-card">
+      <div class="ws-card-header">
+        <span class="ws-dot red"></span>
+        <h3>Ocon</h3>
+        <span class="ws-badge red">RED</span>
+        <span class="ws-meta">16/18 active | 16G 0Y 2R | BL: 6/6 clean</span>
+      </div>
+      <div class="ws-card-body"><div class="accounts-wrap"><table><thead><tr><th>Account</th><th>Status</th><th>Age</th><th>Warmup</th><th>WU Reply %</th><th>WU Score</th><th>Issues</th></tr></thead><tbody><tr>
+              <td><span class="acct-dot red"></span>kevinmulcahy@useoconchemicals.com</td>
+              <td>error</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">-</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Account status: error</td>
+            </tr><tr>
+              <td><span class="acct-dot red"></span>kevin@tryoconchemicals.com</td>
+              <td>error</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">-</td>
+              <td class="metric green">100%</td>
+              <td class="metric red">Account status: error</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevinmulcahy@stockoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">156.2%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin.mulcahy@stockoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">170.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin.mulcahy@tryoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">123.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin.mulcahy@supplyoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">180.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevinmulcahy@supplyoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">207.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin.mulcahy@buyoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">232.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin.mulcahy@withoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">211.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevinmulcahy@withoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">175.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin@withoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">188.8%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevinmulcahy@buyoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">206.2%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevinmulcahy@tryoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">203.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin@stockoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">220.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin@supplyoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">167.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin.mulcahy@useoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">215.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin@useoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">203.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>kevin@buyoconchemicals.com</td>
+              <td>active</td>
+              <td class="metric green">117d</td>
+              <td>ON</td>
+              <td class="metric green">177.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr></tbody></table></div></div></div><div class="ws-card">
+      <div class="ws-card-header">
+        <span class="ws-dot yellow"></span>
+        <h3>Ripple</h3>
+        <span class="ws-badge yellow">YELLOW</span>
+        <span class="ws-meta">18/18 active | 18G 0Y 0R | BL: 6/6 clean</span>
+      </div>
+      <div class="ws-card-body"><div class="accounts-wrap"><table><thead><tr><th>Account</th><th>Status</th><th>Age</th><th>Warmup</th><th>WU Reply %</th><th>WU Score</th><th>Issues</th></tr></thead><tbody><tr>
+              <td><span class="acct-dot green"></span>adrian.smith@tryrippletechnology.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">150.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adriansmith@tryrippletechnology.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">212.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian@tryrippletechnology.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">205.0%</td>
+              <td class="metric green">99%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian.smith@withrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">201.3%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adriansmith@withrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">195.0%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian@withrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">222.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian.smith@tryrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">217.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adriansmith@tryrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">148.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian@tryrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">236.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adriansmith@userippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">193.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian.smith@userippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">247.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian@userippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">236.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian.smith@getrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">176.2%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adriansmith@getrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">206.2%</td>
+              <td class="metric green">98%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian@getrippleai.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">212.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian.smith@tryripplehq.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">212.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adriansmith@tryripplehq.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">182.5%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr><tr>
+              <td><span class="acct-dot green"></span>adrian@tryripplehq.com</td>
+              <td>active</td>
+              <td class="metric green">305d</td>
+              <td>ON</td>
+              <td class="metric green">218.8%</td>
+              <td class="metric green">100%</td>
+              <td class="metric green">-</td>
+            </tr></tbody></table></div></div></div></div>
+    <div class="tab-panel" id="panel-actions"><div class="action-item">
+              <span class="action-sev red">RED</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamieschneiderman@growunstuckyourbusiness.com</div>
+                <div class="action-desc">Account in error/disabled state</div>
+                <div class="action-fix">Check Instantly for connection errors. Re-authenticate the email account if needed.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev red">RED</span>
+              <div class="action-body">
+                <div class="action-title">ODF - daniel.lindsey@tryondemandfulfillment.com</div>
+                <div class="action-desc">Account in error/disabled state</div>
+                <div class="action-fix">Check Instantly for connection errors. Re-authenticate the email account if needed.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev red">RED</span>
+              <div class="action-body">
+                <div class="action-title">Ocon - kevinmulcahy@useoconchemicals.com</div>
+                <div class="action-desc">Account in error/disabled state</div>
+                <div class="action-fix">Check Instantly for connection errors. Re-authenticate the email account if needed.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev red">RED</span>
+              <div class="action-body">
+                <div class="action-title">Ocon - kevin@tryoconchemicals.com</div>
+                <div class="action-desc">Account in error/disabled state</div>
+                <div class="action-fix">Check Instantly for connection errors. Re-authenticate the email account if needed.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Dopamine Digital - dopaminedigitalco.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Dopamine Digital - dopaminedigitalgroup.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Dopamine Digital - dopaminedigitalhub.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Dopamine Digital - dopaminedigitallabs.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Dopamine Digital - dopaminedigitalpartners.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Dopamine Digital - dopaminedigitalpipeline.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - clickunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - easyunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - freeunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - growunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - scaleunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - teamunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - tryunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - unstuckyourbusinessconsultants.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - unstuckyourbusinessgrowth.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - unstuckyourbusinesspartners.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - withunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - workunstuckyourbusiness.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.s@scaleunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.schneiderman@scaleunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie@scaleunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.s@teamunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.schneiderman@teamunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie@teamunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.s@clickunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.schneiderman@clickunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie@clickunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.s@easyunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.schneiderman@easyunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie@easyunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.s@workunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.schneiderman@workunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie@workunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.s@freeunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie.schneiderman@freeunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Jamie (Unstuck) - jamie@freeunstuckyourbusiness.com</div>
+                <div class="action-desc">Mailbox age under 30 days (high risk)</div>
+                <div class="action-fix">Keep warmup active. Send only warmup emails for first 30 days. No campaigns yet.</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Phellos - choosephellos.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Phellos - consultphellos.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Phellos - phellosconsultants.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Phellos - phellosconsulting.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Phellos - phellospartners.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Phellos - withphellos.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">ODF - ondemandfulfillmentlogistics.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">ODF - ondemandfulfillmentpartners.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">ODF - ondemandfulfillmentsolutions.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">ODF - tryondemandfulfillment.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">ODF - useondemandfulfillment.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">ODF - withondemandfulfillment.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ocon - buyoconchemicals.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ocon - stockoconchemicals.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ocon - supplyoconchemicals.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ocon - tryoconchemicals.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ocon - useoconchemicals.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ocon - withoconchemicals.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ripple - getrippleai.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ripple - tryrippleai.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ripple - tryripplehq.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ripple - tryrippletechnology.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ripple - userippleai.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div><div class="action-item">
+              <span class="action-sev yellow">YELLOW</span>
+              <div class="action-body">
+                <div class="action-title">Ripple - withrippleai.com</div>
+                <div class="action-desc">SPF uses ~all (softfail)</div>
+                <div class="action-fix">Change SPF record from ~all to -all to strictly reject unauthorized senders</div>
+              </div>
+            </div></div>
+    <div class="tab-panel" id="panel-dns"><div class="section-header">Dopamine Digital</div><div class="dns-grid"><div class="dns-card"><div class="dns-domain">dopaminedigitalco.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">dopaminedigitalgroup.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">dopaminedigitalhub.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">dopaminedigitallabs.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">dopaminedigitalpartners.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">dopaminedigitalpipeline.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div></div><div class="section-header">Jamie (Unstuck)</div><div class="dns-grid"><div class="dns-card"><div class="dns-domain">clickunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">easyunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">freeunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">growunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">scaleunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">teamunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">tryunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">unstuckyourbusinessconsultants.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">unstuckyourbusinessgrowth.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">unstuckyourbusinesspartners.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">withunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">workunstuckyourbusiness.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=reject (strict)">DMARC p=reject (strict)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="5 MX record(s)">5 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div></div><div class="section-header">Phellos</div><div class="dns-grid"><div class="dns-card"><div class="dns-domain">choosephellos.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">consultphellos.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">phellosconsultants.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">phellosconsulting.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">phellospartners.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="3 MX record(s)">3 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">withphellos.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div></div><div class="section-header">ODF</div><div class="dns-grid"><div class="dns-card"><div class="dns-domain">ondemandfulfillmentlogistics.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">ondemandfulfillmentpartners.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">ondemandfulfillmentsolutions.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">tryondemandfulfillment.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">useondemandfulfillment.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">withondemandfulfillment.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div></div><div class="section-header">Ocon</div><div class="dns-grid"><div class="dns-card"><div class="dns-domain">buyoconchemicals.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">stockoconchemicals.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">supplyoconchemicals.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">tryoconchemicals.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">useoconchemicals.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">withoconchemicals.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div></div><div class="section-header">Ripple</div><div class="dns-grid"><div class="dns-card"><div class="dns-domain">getrippleai.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">tryrippleai.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">tryripplehq.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">tryrippletechnology.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">userippleai.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div><div class="dns-card"><div class="dns-domain">withrippleai.com</div><div class="dns-row"><span class="dns-label">SPF</span><span class="dns-val warn" title="SPF ~all (softfail) - use -all">SPF ~all (softfail) - use -all</span></div><div class="dns-row"><span class="dns-label">DKIM</span><span class="dns-val pass" title="DKIM OK (google)">DKIM OK (google)</span></div><div class="dns-row"><span class="dns-label">DMARC</span><span class="dns-val pass" title="DMARC p=quarantine (optimal)">DMARC p=quarantine (optimal)</span></div><div class="dns-row"><span class="dns-label">MX</span><span class="dns-val pass" title="1 MX record(s)">1 MX record(s)</span></div><div class="dns-row"><span class="dns-label">TRACKING</span><span class="dns-val pass" title="No Instantly tracking CNAMEs">No Instantly tracking CNAMEs</span></div></div></div></div>
+    <div class="tab-panel" id="panel-blacklists"><div class="section-header">Dopamine Digital</div><div class="bl-summary"><div class="bl-domain-row">
+      <span class="bl-domain-name">dopaminedigitalco.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.67.218.215, 104.21.53.211, 142.251.10.26, 142.250.101.27, 172.217.78.27, 172.217.221.26, 192.178.163.27</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">dopaminedigitalgroup.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 142.251.10.26, 104.21.68.87, 142.250.101.27, 172.217.78.27, 172.217.221.26, 192.178.163.27, 172.67.192.125</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">dopaminedigitalhub.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 104.21.15.108, 142.251.10.26, 172.67.162.48, 142.250.101.27, 172.217.78.27, 172.217.221.26, 192.178.163.27</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">dopaminedigitallabs.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 142.251.10.26, 104.21.1.56, 142.250.101.27, 172.217.78.27, 172.217.221.26, 192.178.163.27, 172.67.128.160</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">dopaminedigitalpartners.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 104.21.14.190, 142.251.10.26, 172.67.160.42, 142.250.101.27, 172.217.221.26, 172.217.78.27, 192.178.163.27</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">dopaminedigitalpipeline.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.67.149.10, 142.251.10.26, 142.250.101.27, 172.217.221.26, 172.217.78.27, 192.178.163.27, 104.21.29.134</span>
+    </div></div><div class="section-header">Jamie (Unstuck)</div><div class="bl-summary"><div class="bl-domain-row">
+      <span class="bl-domain-name">clickunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 142.250.101.26, 172.67.157.251, 192.178.163.26, 172.217.78.27, 172.217.221.26, 142.251.10.27, 104.21.58.82</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">easyunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 142.250.101.26, 172.67.135.36, 192.178.163.26, 172.217.78.27, 172.217.221.26, 104.21.26.16, 142.251.10.27</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">freeunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 142.250.101.26, 104.21.51.215, 172.67.186.94, 192.178.163.26, 172.217.221.26, 172.217.78.27, 142.251.10.27</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">growunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">scaleunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 142.250.101.26, 192.178.163.26, 104.21.39.104, 172.217.221.26, 172.217.78.27, 172.67.144.120, 142.251.10.27</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">teamunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 142.250.101.26, 104.21.6.141, 192.178.163.26, 172.217.221.26, 172.217.78.27, 142.251.10.27, 172.67.155.14</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">tryunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">unstuckyourbusinessconsultants.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">unstuckyourbusinessgrowth.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">unstuckyourbusinesspartners.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">withunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">workunstuckyourbusiness.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 142.250.101.26, 104.21.30.231, 172.217.78.26, 172.217.194.26, 172.67.173.247, 192.178.163.26, 172.217.221.27</span>
+    </div></div><div class="section-header">Phellos</div><div class="bl-summary"><div class="bl-domain-row">
+      <span class="bl-domain-name">choosephellos.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">consultphellos.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">phellosconsultants.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">phellosconsulting.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">phellospartners.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">288 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 44.226.226.6, 74.125.200.26, 74.125.130.27, 44.230.85.241, 52.10.201.111</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">withphellos.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div></div><div class="section-header">ODF</div><div class="bl-summary"><div class="bl-domain-row">
+      <span class="bl-domain-name">ondemandfulfillmentlogistics.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">ondemandfulfillmentpartners.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">ondemandfulfillmentsolutions.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">tryondemandfulfillment.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">useondemandfulfillment.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">withondemandfulfillment.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div></div><div class="section-header">Ocon</div><div class="bl-summary"><div class="bl-domain-row">
+      <span class="bl-domain-name">buyoconchemicals.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">stockoconchemicals.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">supplyoconchemicals.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 172.253.118.27, 52.33.207.7, 74.125.200.27, 74.125.200.26, 74.125.130.27, 44.230.85.241</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">tryoconchemicals.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">useoconchemicals.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">withoconchemicals.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div></div><div class="section-header">Ripple</div><div class="bl-summary"><div class="bl-domain-row">
+      <span class="bl-domain-name">getrippleai.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">tryrippleai.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">tryripplehq.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">tryrippletechnology.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">userippleai.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div><div class="bl-domain-row">
+      <span class="bl-domain-name">withrippleai.com</span>
+      <span class="bl-status clean">CLEAN</span>
+      <span class="bl-details">224 checks | IPs: 172.253.118.26, 142.251.10.26, 52.33.207.7, 44.230.85.241, 142.251.12.27, 142.251.10.27, 142.251.12.26</span>
+    </div></div></div>
+    <div class="tab-panel" id="panel-campaigns"><div class="empty-state">No campaign issues detected. All campaigns are within healthy thresholds.</div></div>
+    <div class="tab-panel" id="panel-placement"><div class="empty-state">Inbox placement testing requires a MailReach API key.<br>Set <code>MAILREACH_API_KEY</code> environment variable to enable.<br>Cost: $0.35/test (pay-as-you-go at mailreach.co)</div></div>
+  </div>
+</main>
+
+<div class="footer"><p>Dopamine Digital &mdash; Deliverability Monitor v2.0 &mdash; Generated Tue Mar 10, 12:21 AM</p></div>
+
+<script>
+/* Theme toggle */
+function toggleTheme(){
+  var t=document.documentElement.getAttribute('data-theme');
+  var n=t==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',n);
+  localStorage.setItem('dm-theme',n);
+  updateThemeUI();
+}
+function updateThemeUI(){
+  var t=document.documentElement.getAttribute('data-theme')||'dark';
+  var icon=document.getElementById('theme-icon');
+  var label=document.getElementById('theme-label');
+  if(icon)icon.textContent=t==='dark'?'\u263E':'\u2600';
+  if(label)label.textContent=t==='dark'?'Dark':'Light';
+}
+updateThemeUI();
+
+/* Sidebar toggle */
+function toggleSidebar(){
+  document.body.classList.toggle('sidebar-collapsed');
+  document.documentElement.classList.remove('sidebar-collapsed-pending');
+  localStorage.setItem('dm-sidebar-collapsed',document.body.classList.contains('sidebar-collapsed')?'1':'0');
+}
+if(document.documentElement.classList.contains('sidebar-collapsed-pending')){
+  document.body.classList.add('sidebar-collapsed');
+  document.documentElement.classList.remove('sidebar-collapsed-pending');
+}
+
+/* Tab switching */
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
+  document.querySelectorAll('.toc-link').forEach(function(l){l.classList.remove('active')});
+  var panel=document.getElementById('panel-'+id);
+  if(panel)panel.classList.add('active');
+  document.querySelectorAll('.tab-btn[data-tab="'+id+'"]').forEach(function(b){b.classList.add('active')});
+  document.querySelectorAll('.toc-link[data-tab="'+id+'"]').forEach(function(l){l.classList.add('active')});
+}
+document.querySelectorAll('.tab-btn[data-tab]').forEach(function(b){
+  b.addEventListener('click',function(){switchTab(this.getAttribute('data-tab'))});
+});
+document.querySelectorAll('.toc-link[data-tab]').forEach(function(l){
+  l.addEventListener('click',function(){switchTab(this.getAttribute('data-tab'))});
+});
+
+/* Workspace card toggle */
+document.addEventListener('click',function(e){
+  var h=e.target.closest('.ws-card-header');
+  if(h){var b=h.nextElementSibling;if(b)b.classList.toggle('collapsed');h.classList.toggle('collapsed')}
+});
+
+/* Reading progress */
+window.addEventListener('scroll',function(){
+  var h=document.documentElement.scrollHeight-window.innerHeight;
+  var p=h>0?(window.scrollY/h)*100:0;
+  var bar=document.getElementById('readingProgress');
+  if(bar)bar.style.width=p+'%';
+});
+
+/* Fade-in observer */
+var obs=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(function(el){obs.observe(el)});
+</script>
+</body>
+</html>
