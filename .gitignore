@@ -1,0 +1,15 @@
+# Source files (unencrypted)
+.src.html
+*.src.html
+
+# StatiCrypt template (don't expose on GitHub Pages)
+password-template.html
+.staticrypt.json
+
+# Secrets
+.env
+*.key
+credentials.*
+
+# OS
+.DS_Store
